@@ -12,11 +12,13 @@
 <div class="collapse navbar-collapse" id="n"><ul class="navbar-nav ms-auto align-items-lg-center">
 <?php if($u&&$u['role']==='admin'):?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/admin/messages.php">Admin panel <span class="hk-badge" style="display:none">0</span></a></li>
 <?php elseif($u):?>
-<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/dashboard.php">Dashboard</a></li>
+<!--<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/dashboard.php">Dashboard</a></li>-->
 <li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/health-profile.php">Health profile</a></li>
 <li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/product.php">Bracelet</a></li>
 <li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/my-qr.php">My QR</a></li>
-<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/stories.php">Stories</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/chatbot.php">Assistant</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/support.php">Support <span class="hk-badge" style="display:none">0</span></a></li>
+<!--<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/stories.php">Stories</a></li>-->
+<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/chatbot.php">Assistant</a></li>
+<li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/support.php">Support <span class="hk-badge" style="display:none">0</span></a></li>
 <?php endif; if($u):?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/logout.php"><i class="bi bi-box-arrow-right"></i> <?=e(explode(' ',$u['name'])[0])?></a></li>
 <?php else:?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/#how">How it works</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/#bracelets">Bracelets</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/stories.php">Stories</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/login.php">Log in</a></li><li class="nav-item"><a class="nav-link cta" href="<?=BASE_URL?>/register.php">Get started</a></li><?php endif;?>
 </ul></div></div></nav><main class="container py-4 py-lg-5" id="top"><?=flash()?>
