@@ -5,9 +5,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
  flash('Invalid email or password.','danger');
 }
 $title='Login'; require 'includes/header.php'; ?>
-<div class="row justify-content-center"><div class="col-md-5"><div class="card p-4"><h3>Login</h3>
+<div class="auth"><div class="card"><h3>Login</h3>
 <form method="post"><?=csrf()?><div class="mb-2"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
 <div class="mb-3"><label class="form-label">Password</label><input type="password" name="password" class="form-control" required></div>
 <button class="btn btn-primary w-100">Login</button></form>
-<p class="small text-muted mt-3 mb-0">Demo: user@healthkey.test / User123! &nbsp;|&nbsp; admin@healthkey.test / Admin123!</p></div></div></div>
+<p class="small text-muted mt-3 mb-0">Demo: user@healthkey.test / User123! &nbsp;|&nbsp; admin@healthkey.test / Admin123!</p></div></div>
 <?php require 'includes/footer.php';

@@ -9,12 +9,12 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
  else{q("INSERT INTO users(name,email,password,phone,role) VALUES(?,?,?,?, 'user')",[$n,$em,password_hash($pw,PASSWORD_DEFAULT),$ph]);flash('Registration successful. Please login.');redirect('login.php');}
 }
 $title='Register'; require 'includes/header.php'; ?>
-<div class="row justify-content-center"><div class="col-md-6"><div class="card p-4"><h3>Create account</h3>
+<div class="auth"><div class="card"><h3>Create account</h3>
 <form method="post"><?=csrf()?>
 <div class="mb-2"><label class="form-label">Full Name</label><input name="name" class="form-control" required value="<?=e($_POST['name']??'')?>"></div>
 <div class="mb-2"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required value="<?=e($_POST['email']??'')?>"></div>
 <div class="mb-2"><label class="form-label">Phone Number</label><input name="phone" class="form-control" value="<?=e($_POST['phone']??'')?>"></div>
 <div class="mb-2"><label class="form-label">Password</label><input type="password" name="password" class="form-control" required></div>
 <div class="mb-3"><label class="form-label">Confirm Password</label><input type="password" name="confirm" class="form-control" required></div>
-<button class="btn btn-primary w-100">Register</button></form></div></div></div>
+<button class="btn btn-primary w-100">Register</button></form></div></div>
 <?php require 'includes/footer.php';
