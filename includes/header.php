@@ -18,5 +18,5 @@
 <li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/my-qr.php">My QR</a></li>
 <li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/chatbot.php">Chat</a></li>
 <?php endif; if($u):?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/logout.php"><i class="bi bi-box-arrow-right"></i> <?=e(explode(' ',$u['name'])[0])?></a></li>
-<?php else:?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/login.php">Log in</a></li><li class="nav-item"><a class="nav-link cta" href="<?=BASE_URL?>/register.php">Get started</a></li><?php endif;?>
-</ul></div></div></nav><main class="container py-4 py-lg-5"><?=flash()?>
+<?php else:?><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/#how">How it works</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/#bracelets">Bracelets</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/#stories">Stories</a></li><li class="nav-item"><a class="nav-link" href="<?=BASE_URL?>/login.php">Log in</a></li><li class="nav-item"><a class="nav-link cta" href="<?=BASE_URL?>/register.php">Get started</a></li><?php endif;?>
+</ul></div></div></nav><main class="container py-4 py-lg-5" id="top"><?=flash()?>
