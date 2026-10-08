@@ -1,1 +1,1 @@
-<?php require 'includes/bootstrap.php'; redirect('chatbot.php');
+<?php require 'includes/bootstrap.php'; redirect('support.php');
