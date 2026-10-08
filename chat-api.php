@@ -19,5 +19,6 @@ if(ai_ready()){
   [$r,$e]=ai_reply($h,$prof?:null);
   if(!$r){error_log('HealthKey AI: '.$e);$r=bot_reply($m);$note=(strpos((string)$e,'api 429')===0)?'The free AI limit was reached for now, so this is a basic answer. Try again in a minute.':'AI is unavailable right now, so this is a basic answer.';}}
 }else{$r=bot_reply($m);$note='AI mode is off (no API key set), so this is the basic rule-based bot.';}
+if(AI_DEBUG&&!empty($e))$note.=' [debug: '.$e.']';
 q("INSERT INTO chat_messages(user_id,sender,message) VALUES(?, 'bot',?)",[$uid,$r]);
 out(['ok'=>true,'reply'=>$r,'note'=>$note]);

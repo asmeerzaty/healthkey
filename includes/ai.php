@@ -16,12 +16,26 @@ function ai_reply(array $msgs,$profile=null){
  // BLOCK_ONLY_HIGH so ordinary medical questions (overdose, symptoms) are not wrongly blocked.
  $safety=array_map(fn($c)=>['category'=>$c,'threshold'=>'BLOCK_ONLY_HIGH'],['HARM_CATEGORY_HARASSMENT','HARM_CATEGORY_HATE_SPEECH','HARM_CATEGORY_SEXUALLY_EXPLICIT','HARM_CATEGORY_DANGEROUS_CONTENT']);
  $body=['system_instruction'=>['parts'=>[['text'=>ai_system($profile)]]],'contents'=>$contents,'safetySettings'=>$safety,'generationConfig'=>['maxOutputTokens'=>2500,'temperature'=>0.5]];
- $ch=curl_init('https://generativelanguage.googleapis.com/v1beta/models/'.rawurlencode(AI_MODEL).':generateContent');
- curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_TIMEOUT=>60,
+ // Try the main model (retrying on temporary 503 overload), then a fallback model.
+ $models=array_values(array_unique(array_filter([AI_MODEL,AI_FALLBACK_MODEL])));$last='unknown';
+ foreach($models as $mi=>$model){
+  for($try=0;$try<($mi===0?3:1);$try++){
+   if($try)sleep($try*2);
+   [$t,$e,$code]=ai_call($model,$body);
+   if($t)return [$t,null];
+   $last="[$model] $e";
+   if($code!==503&&$code!==0)break;   // only retry temporary overload / network blips
+  }}
+ return [null,$last];}
+// One HTTP call. Returns [text|null, error|null, httpCode]
+function ai_call($model,$body){
+ $ch=curl_init('https://generativelanguage.googleapis.com/v1beta/models/'.rawurlencode($model).':generateContent');
+ curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_TIMEOUT=>40,
   CURLOPT_HTTPHEADER=>['content-type: application/json','x-goog-api-key: '.GEMINI_API_KEY],CURLOPT_POSTFIELDS=>json_encode($body)]);
  $r=curl_exec($ch);$err=curl_error($ch);$code=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
- if($r===false)return [null,'network: '.$err];
+ if($r===false)return [null,'network: '.$err,0];
  $j=json_decode($r,true);
- if($code!==200)return [null,'api '.$code.': '.($j['error']['message']??'unknown')];
+ if($code!==200)return [null,'api '.$code.': '.($j['error']['message']??'unknown'),$code];
  $t='';foreach($j['candidates'][0]['content']['parts']??[] as $p)if(isset($p['text']))$t.=$p['text'];
- return [trim($t)?:null,trim($t)?null:'empty/blocked: '.($j['candidates'][0]['finishReason']??$j['promptFeedback']['blockReason']??'?')];}
+ $t=trim($t);
+ return [$t?:null,$t?null:'empty/blocked: '.($j['candidates'][0]['finishReason']??$j['promptFeedback']['blockReason']??'?'),$code];}
