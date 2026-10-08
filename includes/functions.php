@@ -25,3 +25,6 @@ function bot_reply($t){$t=strtolower($t);$r=[
  ['buy|purchase|price','Go to the Bracelet page, click Buy Now and complete the demo checkout. Your QR is revealed after payment.']];
  foreach($r as [$k,$a])if(preg_match("/$k/",$t))return $a;
  return 'Sorry, I only know basic topics (first aid, blood type, QR, allergies). Try "Contact Admin" for other questions.';}
+
+// 'Seen' time label: '10:42 PM' today, otherwise '7 Oct, 10:42 PM'
+function seen_label($dt){$t=strtotime($dt);return date('Y-m-d',$t)===date('Y-m-d')?date('g:i A',$t):date('j M, g:i A',$t);}

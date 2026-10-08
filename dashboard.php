@@ -1,5 +1,5 @@
 <?php $title='Dashboard'; require 'includes/header.php'; require_login();
-if($u['role']==='admin')redirect('admin/');
+if($u['role']!=='user')redirect('admin/');
 $pc=profile_complete($u['id']);$qr=qr_of($u['id']);$o=q('SELECT * FROM orders WHERE user_id=? ORDER BY id DESC LIMIT 1',[$u['id']])->fetch();
 $paid=has_paid($u['id']);$last=$qr?q('SELECT MAX(accessed_at) m FROM emergency_access_logs WHERE qr_id=?',[$qr['id']])->fetch()['m']:null;?>
 <div class="page-head"><div><h2 class="mb-0">Hi, <?=e(explode(' ',$u['name'])[0])?></h2><span class="text-muted">Here's the state of your HEALTHKEY.</span></div></div><div class="row g-3 mt-1">
@@ -8,5 +8,7 @@ $paid=has_paid($u['id']);$last=$qr?q('SELECT MAX(accessed_at) m FROM emergency_a
 <div class="col-md-3"><div class="card tile"><span class="ico"><i class="bi bi-bag-check"></i></span><h6>Order</h6><span class="badge bg-info text-dark align-self-start"><?=$o?ucfirst($o['payment_status']):'No order'?></span><a href="product.php" class="mt-auto pt-2">Bracelet page</a></div></div>
 <div class="col-md-3"><div class="card tile"><span class="ico"><i class="bi bi-chat-dots"></i></span><h6>Chatbot / Admin</h6><small class="text-muted">General info only</small><a href="chatbot.php" class="mt-auto pt-2">AI assistant</a><a href="support.php" class="pt-0">Contact admin</a></div></div></div>
 <?php if(!$qr):?><div class="card p-3 mt-3"><b>Already have a bracelet tag?</b> <a href="claim-qr.php">Claim your QR</a> to declare ownership.</div><?php endif;?>
+<?php $ap=q("SELECT * FROM appointments WHERE user_id=? AND status='upcoming' AND appointment_date>=NOW() ORDER BY appointment_date LIMIT 3",[$u['id']])->fetchAll();?>
+<div class="card p-4 mt-3"><div class="d-flex justify-content-between"><h5 class="mb-3"><i class="bi bi-calendar-heart"></i> Upcoming appointments</h5><a href="appointments.php" class="small fw-semibold">Manage</a></div><?php foreach($ap as $a):?><div class="d-flex justify-content-between border-top py-2"><span><b><?=e($a['title'])?></b> <span class="text-muted"><?=e($a['doctor_name'])?></span></span><span class="text-muted"><?=e(date('j M, g:i A',strtotime($a['appointment_date'])))?></span></div><?php endforeach;if(!$ap)echo '<p class="text-muted mb-0">None scheduled. <a href="appointments.php?new=1">Add one</a></p>';?></div>
 <?php if($last):?><div class="alert alert-info mt-3">Your QR was last scanned on <?=e($last)?>.</div><?php endif;?>
 <?php require 'includes/footer.php';

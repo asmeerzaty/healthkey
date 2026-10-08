@@ -1,5 +1,7 @@
-<?php require '_top.php';[$pg,$off,$per]=page(0);$tot=q('SELECT COUNT(*) c FROM emergency_access_logs')->fetch()['c'];
+<?php require '_top.php';
+if($_SERVER['REQUEST_METHOD']==='POST'){if(isset($_POST['clear'])){q('DELETE FROM emergency_access_logs');flash('All scan logs cleared.');}else{q('DELETE FROM emergency_access_logs WHERE id=?',[(int)$_POST['id']]);flash('Log entry deleted.');}header('Location: scan-logs.php');exit;}
+[$pg,$off,$per]=page(0);$tot=q('SELECT COUNT(*) c FROM emergency_access_logs')->fetch()['c'];
 $rows=q("SELECT l.*,u.name FROM emergency_access_logs l JOIN qr_codes c ON c.id=l.qr_id LEFT JOIN users u ON u.id=c.user_id ORDER BY l.id DESC LIMIT $per OFFSET $off")->fetchAll();?>
-<h3>Emergency Scan Logs</h3><div class="table-responsive card p-2"><table class="table mb-0"><tr><th>Patient</th><th>Time</th><th>IP</th><th>Device</th></tr>
-<?php foreach($rows as $r):?><tr><td><?=e($r['name'])?></td><td><?=e($r['accessed_at'])?></td><td><?=e($r['ip_address'])?></td><td class="small"><?=e(substr($r['user_agent'],0,70))?></td></tr><?php endforeach;?></table></div><?php pager($tot);?>
+<div class="page-head"><h3 class="mb-0">Emergency Scan Logs</h3><form method="post" onsubmit="return confirm('Delete ALL scan logs?')"><?=csrf()?><button name="clear" value="1" class="btn btn-outline-danger btn-sm">Clear all logs</button></form></div><div class="table-responsive card p-2"><table class="table mb-0"><tr><th>Patient</th><th>Time</th><th>IP</th><th>Device</th><th></th></tr>
+<?php foreach($rows as $r):?><tr><td><?=e($r['name'])?></td><td><?=e($r['accessed_at'])?></td><td><?=e($r['ip_address'])?></td><td class="small"><?=e(substr($r['user_agent'],0,70))?></td><td><form method="post"><?=csrf()?><input type="hidden" name="id" value="<?=$r['id']?>"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form></td></tr><?php endforeach;?></table></div><?php pager($tot);?>
 <?php require '_bottom.php';

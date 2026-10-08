@@ -1,0 +1,18 @@
+<?php require '_top.php'; // Owner <-> admins only. Customers never appear here.
+$mine=$super?'super':'admin';$other=$super?'admin':'super';
+$admins=$super?q("SELECT u.id,u.name,(SELECT MAX(id) FROM staff_messages s WHERE s.admin_id=u.id) last,(SELECT COUNT(*) FROM staff_messages s WHERE s.admin_id=u.id AND s.sender_role='admin' AND s.is_read=0) unread FROM users u WHERE u.role='admin' AND u.is_active=1 ORDER BY unread DESC,last DESC,u.name")->fetchAll():[];
+$aid=$super?(int)($_GET['aid']??($admins[0]['id']??0)):$u['id'];
+if($_SERVER['REQUEST_METHOD']==='POST'){$t=$super?(int)($_POST['aid']??0):$u['id'];
+ if($super&&isset($_POST['delthread'])){q('DELETE FROM staff_messages WHERE admin_id=?',[$t]);flash('Conversation deleted.');header('Location: staff-chat.php');exit;}
+ $msg=trim($_POST['message']??'');$ok=$super?(bool)q("SELECT 1 FROM users WHERE id=? AND role='admin'",[$t])->fetch():true;
+ if($msg!==''&&$ok)q('INSERT INTO staff_messages(admin_id,sender_role,message,is_read) VALUES(?,?,?,0)',[$t,$mine,$msg]);
+ header('Location: staff-chat.php?aid='.$t);exit;}
+$aname=$aid?(q('SELECT name FROM users WHERE id=?',[$aid])->fetch()['name']??''):'';$msgs=[];
+if($aid){q('UPDATE staff_messages SET is_read=1,read_at=NOW() WHERE admin_id=? AND sender_role=? AND is_read=0',[$aid,$other]);$msgs=q('SELECT * FROM staff_messages WHERE admin_id=? ORDER BY id',[$aid])->fetchAll();}?>
+<h3><?=$super?'Staff chat':'Chat with owner'?> <small class="text-muted fs-6">(private between owner and admins)</small></h3>
+<div class="row g-3"><?php if($super):?><div class="col-md-4"><div class="card" style="overflow:hidden"><?php foreach($admins as $x):?><a class="thread <?=$x['id']==$aid?'on':''?>" href="?aid=<?=$x['id']?>"><div class="d-flex justify-content-between"><b><?=e($x['name'])?></b><?php if($x['unread']&&$x['id']!=$aid):?><span class="hk-badge" style="margin:0"><?=$x['unread']?></span><?php endif;?></div></a><?php endforeach;if(!$admins)echo '<div class="p-3 text-muted">No active admins. <a href="staff-form.php">Add one</a>.</div>';?></div></div><?php endif;?>
+<div class="<?=$super?'col-md-8':'col-12'?>"><?php if($aid):?><div class="card chatbox" style="height:560px"><div class="p-3 border-bottom"><b><?=e($super?$aname:'Owner')?></b><?php if($super):?><form method="post" class="float-end" onsubmit="return confirm('Delete this conversation?')"><?=csrf()?><input type="hidden" name="aid" value="<?=$aid?>"><button name="delthread" value="1" class="btn btn-sm btn-outline-danger">Delete chat</button></form><?php endif;?></div>
+<div id="msgs" class="msgs"><?php foreach($msgs as $m):$my=$m['sender_role']===$mine;?><div class="bub b-<?=$my?'user':'admin'?>"><small><?=$my?'You':e($m['sender_role']==='super'?'Owner':$aname)?> · <?=e(seen_label($m['created_at']))?></small><p><?=nl2br(e($m['message']))?></p><?php if($my):?><span class="rcpt <?=$m['is_read']?'seen':''?>"><?=$m['is_read']?'✓✓ Seen'.($m['read_at']?' · '.e(seen_label($m['read_at'])):''):'✓ Sent'?></span><?php endif;?></div><?php endforeach;?></div>
+<form method="post" class="inputbar"><?=csrf()?><input type="hidden" name="aid" value="<?=$aid?>"><input id="reply" name="message" class="form-control" placeholder="Write a message…" required autocomplete="off"><button class="btn btn-primary"><i class="bi bi-send-fill"></i></button></form></div>
+<script>document.getElementById('msgs').scrollTop=1e9;setInterval(()=>{if(!document.getElementById('reply').value)location.reload()},15000)</script><?php else:?><div class="card p-4 text-muted">Select an admin to start chatting.</div><?php endif;?></div></div>
+<?php require '_bottom.php';

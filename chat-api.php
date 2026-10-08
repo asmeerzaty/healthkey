@@ -6,8 +6,9 @@ $act=$_REQUEST['action']??'';
 // User polls for new admin replies (admin channel only), then marks them read.
 if($act==='poll'){$after=(int)($_GET['after']??0);
  $rows=q("SELECT id,sender,message FROM chat_messages WHERE user_id=? AND channel='admin' AND sender='admin' AND id>? ORDER BY id",[$uid,$after])->fetchAll();
- if($rows)q("UPDATE chat_messages SET is_read=1 WHERE user_id=? AND channel='admin' AND sender='admin'",[$uid]);
- out(['ok'=>true,'messages'=>$rows]);}
+ if($rows)q("UPDATE chat_messages SET is_read=1,read_at=NOW() WHERE user_id=? AND channel='admin' AND sender='admin' AND is_read=0",[$uid]);
+ $seen=array_map(fn($x)=>['id'=>(int)$x['id'],'at'=>$x['read_at']?seen_label($x['read_at']):''],q("SELECT id,read_at FROM chat_messages WHERE user_id=? AND channel='admin' AND sender='user' AND is_read=1",[$uid])->fetchAll());
+ out(['ok'=>true,'messages'=>$rows,'seen'=>$seen]);}
 if($act==='clear'){if($ch==='ai')q("DELETE FROM chat_messages WHERE user_id=? AND channel='ai'",[$uid]);out(['ok'=>true]);}
 $m=trim($_POST['message']??'');if($m===''||mb_strlen($m)>1000)out(['ok'=>false,'error'=>'Message must be 1–1000 characters.']);
 // ---- Contact-admin channel: no AI involved; flagged unread so the admin gets a notification ----

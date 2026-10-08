@@ -1,5 +1,6 @@
 <?php $title='Health Profile'; require 'includes/header.php'; require_login();
 $f=['date_of_birth','blood_type','allergies','medical_conditions','medications','emergency_contact_name','emergency_contact_phone','emergency_contact_relationship','doctor_name','additional_notes'];
+if($_SERVER['REQUEST_METHOD']==='POST'&&($_POST['act']??'')==='delete'){q('DELETE FROM patient_profiles WHERE user_id=?',[$u['id']]);q("UPDATE qr_codes SET status='claimed' WHERE user_id=? AND status='active'",[$u['id']]);flash('Your health data was deleted. Your QR is paused until you add it again.','warning');redirect('health-profile.php');}
 if($_SERVER['REQUEST_METHOD']==='POST'){
  $v=[];foreach($f as $k)$v[$k]=trim($_POST[$k]??'')?:null;$sn=isset($_POST['share_notes'])?1:0;
  if(!$v['blood_type']||!$v['emergency_contact_name']||!$v['emergency_contact_phone']){flash('Blood type and emergency contact name & phone are required.','danger');}
@@ -19,5 +20,6 @@ fld('Allergies','allergies',$p,'area');fld('Medical Conditions','medical_conditi
 fld('Emergency Contact Name','emergency_contact_name',$p,'text',true);fld('Emergency Contact Phone','emergency_contact_phone',$p,'text',true);fld('Relationship','emergency_contact_relationship',$p);
 fld('Additional Medical Notes (private by default)','additional_notes',$p,'area');?>
 <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="share_notes" id="sn" <?=$p['share_notes']?'checked':''?>><label class="form-check-label" for="sn">Show additional notes on the public emergency page</label></div></div>
-<div class="col-12"><button class="btn btn-primary">Save</button></div></div></form></div>
+<div class="col-12"><button class="btn btn-primary">Save</button></div></div></form>
+<?php if(profile_of($u['id'])):?><hr><form method="post" onsubmit="return confirm('Delete ALL your health information? Your QR will stop showing data.')"><?=csrf()?><input type="hidden" name="act" value="delete"><button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete my health data</button></form><?php endif;?></div>
 <?php require 'includes/footer.php';

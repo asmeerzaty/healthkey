@@ -1,7 +1,7 @@
 <?php require 'includes/bootstrap.php';
 if($_SERVER['REQUEST_METHOD']==='POST'){
  $u=q('SELECT * FROM users WHERE email=? AND is_active=1',[strtolower(trim($_POST['email']??''))])->fetch();
- if($u&&password_verify($_POST['password']??'',$u['password'])){session_regenerate_id(true);$_SESSION['uid']=$u['id'];redirect($u['role']==='admin'?'admin/':'dashboard.php');}
+ if($u&&password_verify($_POST['password']??'',$u['password'])){session_regenerate_id(true);$_SESSION['uid']=$u['id'];redirect(in_array($u['role'],['admin','superadmin'])?'admin/':'dashboard.php');}
  flash('Invalid email or password.','danger');
 }
 $title='Login'; require 'includes/header.php'; ?>

@@ -135,3 +135,4 @@ a{color:var(--blue)}a:hover{color:var(--teal-d)}
 .chat-tabs{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:1rem}
 .chat-tabs a{padding:.5rem 1.1rem;border-radius:10px;font-weight:600;text-decoration:none;color:var(--ink2)}.chat-tabs a.on{background:var(--ink);color:#fff}
 .thread{display:block;padding:.8rem 1rem;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}.thread.on{background:#e8f8f6}.thread.unread b{color:var(--ink)}
+.rcpt{display:block;text-align:right;font-size:.7rem;margin-top:.25rem;color:#9fb3c8;font-weight:600}.rcpt.seen{color:var(--teal)}

@@ -1,0 +1,2 @@
+-- Run ONCE in phpMyAdmin (SQL tab, database: healthkey).
+CREATE TABLE IF NOT EXISTS appointments(id INT AUTO_INCREMENT PRIMARY KEY,user_id INT NOT NULL,title VARCHAR(120) NOT NULL,doctor_name VARCHAR(100),location VARCHAR(150),appointment_date DATETIME NOT NULL,notes TEXT,status ENUM('upcoming','completed','cancelled') NOT NULL DEFAULT 'upcoming',created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX(user_id,appointment_date),FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
