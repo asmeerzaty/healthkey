@@ -8,6 +8,6 @@ $title='Login'; require 'includes/header.php'; ?>
 <div class="auth"><div class="card"><h3>Login</h3>
 <form method="post"><?=csrf()?><div class="mb-2"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
 <div class="mb-3"><label class="form-label">Password</label><input type="password" name="password" class="form-control" required></div>
-<button class="btn btn-primary w-100">Login</button></form>
+<button class="btn btn-primary w-100">Login</button><a class="btn btn-primary w-100 mt-2" href="<?=BASE_URL?>/register.php">Register New User</a></form>
 <p class="small text-muted mt-3 mb-0">Demo: user@healthkey.test / User123! &nbsp;|&nbsp; admin@healthkey.test / Admin123!</p></div></div>
 <?php require 'includes/footer.php';
