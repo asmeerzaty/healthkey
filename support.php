@@ -4,8 +4,8 @@ $msgs=q("SELECT id,sender,message,is_read,read_at FROM chat_messages WHERE user_
 foreach($msgs as &$m)$m['seen_at']=$m['read_at']?seen_label($m['read_at']):'';unset($m);
 q("UPDATE chat_messages SET is_read=1,read_at=NOW() WHERE user_id=? AND channel='admin' AND sender='admin' AND is_read=0",[$u['id']]);
 $lastAdmin=0;foreach($msgs as $m)if($m['sender']==='admin')$lastAdmin=max($lastAdmin,$m['id']);?>
-<div class="chat-tabs"><a href="chatbot.php"><i class="bi bi-stars"></i> AI Assistant</a><a class="on" href="support.php"><i class="bi bi-person-headset"></i> Contact admin</a></div>
-<div class="row justify-content-center"><div class="col-lg-9"><div class="card chatbox"><div class="p-3 border-bottom d-flex align-items-center gap-2"><span class="brand-dot text-white"><i class="bi bi-person-headset"></i></span><div><b>Chat with admin</b><div class="small text-muted">A real person reads this — no AI here. Replies appear in this chat.</div></div></div>
+<div class="chat-tabs"><a href="chatbot.php"><i class="bi bi-stars"></i> AI Assistant</a><a class="on" href="support.php"><i class="bi bi-headset"></i> Contact admin</a></div>
+<div class="row justify-content-center"><div class="col-lg-9"><div class="card chatbox"><div class="p-3 border-bottom d-flex align-items-center gap-2"><span class="brand-dot text-white"><i class="bi bi-headset"></i></span><div><b>Chat with admin</b><div class="small text-muted">A real person reads this — no AI here. Replies appear in this chat.</div></div></div>
 <div id="msgs" class="msgs"></div>
 <form id="f" class="inputbar"><input id="m" class="form-control" maxlength="1000" placeholder="Write a message to the admin…" autocomplete="off" required><button class="btn btn-primary" id="s"><i class="bi bi-send-fill"></i></button></form>
 <div class="disc">Do not use this for emergencies — call 999 / 112.</div></div></div></div>

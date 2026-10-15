@@ -9,4 +9,4 @@ INSERT INTO bracelets(id,name,type,material,price,stock,color1,color2,descriptio
 (2,'Steel Edge','adult','Stainless steel',59.90,40,'94A3B8','334155','Laser-engraved, refined'),
 (3,'Kids Colour','kids','Silicone',29.90,60,'F59E0B','F0484B','Bright, tough, tear-resistant');
 UPDATE orders SET bracelet_id=1 WHERE bracelet_id IS NULL;
-INSERT INTO users(id,name,email,password,phone,role) VALUES(3,'HealthKey Owner','owner@healthkey.test','$2y$10$nl3dQxGlQveGJ6W.Q8YnSezXoZsHM3j9SCd33Yk87C8ToTev38mpe','0111111111','superadmin');
+INSERT IGNORE INTO users(name,email,password,phone,role) VALUES('HealthKey Owner','owner@healthkey.test','$2y$10$nl3dQxGlQveGJ6W.Q8YnSezXoZsHM3j9SCd33Yk87C8ToTev38mpe','0111111111','superadmin');

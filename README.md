@@ -1,5 +1,5 @@
 # HEALTHKEY — QR health bracelet prototype (PHP + MySQL)
-Academic prototype. **Not a medical device.** The QR holds only a random token URL (`/scan.php?token=...`); no medical data.
+Academic prototype. **Not a medical device.** The QR holds only a random token URL (`/scan.php?token=...`); no medical data. The optional NFC tag holds a short text of essentials only (see v2 below).
 
 ## Setup (XAMPP / WAMP / Laragon)
 1. Extract the `healthkey` folder into `htdocs` (or `www`).
@@ -8,6 +8,18 @@ Academic prototype. **Not a medical device.** The QR holds only a random token U
 4. Edit `includes/config.php` if your DB user/password or folder name differ (`BASE_URL`).
 5. Open http://localhost/healthkey/
 No Composer needed: QR images are drawn in the browser with qrcode.js (CDN), so an internet connection is required for the QR image, Bootstrap and icons.
+
+## What's new in v2
+- **Fresh install:** import `database/healthkey.sql` only (it already includes v2). **Existing database:** run `database/migration_v2.sql` once instead. Do not run both.
+- **New look:** rebuilt theme in `assets/css/style.css`; the emergency scan page is bare (no site nav), shows allergies first, has Call contact / Call 999 buttons and an EN / BM toggle (`?lang=ms`).
+- **Your own photos:**
+  - Bracelets: Owner panel -> Bracelets -> Edit -> *Photo* (JPG/PNG/WebP, max 5 MB).
+  - Stories: Admin/Owner panel -> *Story photos*, or copy a file into `assets/img/stories/<slug>.jpg` (e.g. `aisyah-asthma.jpg`). No photo = the illustration is used.
+  - Uploads are checked by real image type, renamed, and the upload folders block script execution (`.htaccess`).
+- **NFC tag text (`nfc.php`):** generates a compact essentials-only text (name, blood type, allergies, emergency contact, optional conditions / medication / DOB / doctor, optional live link). Copy it into a free NFC app (e.g. NFC Tools) -> Write -> Add a record -> Text. Use an NTAG215 or NTAG216 chip (213 is too small). The page shows a size meter and flags the tag as out of date when your profile or QR link changes. "Write from this phone" works only on Android Chrome over HTTPS.
+- **My QR:** pause / resume / replace your QR (replacing kills the old printed code at once) and see your scan history.
+- **Safety and privacy:** login lockout (8 failures / 15 min), consent checkbox at registration, `privacy.php`, and a confirmation before the AI assistant sends your profile to Google.
+- Not included: SMS/email alert on scan, forgot-password, multiple emergency contacts.
 
 ## Demo logins
 - Admin: admin@healthkey.test / Admin123!
