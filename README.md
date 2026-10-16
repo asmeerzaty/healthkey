@@ -70,20 +70,6 @@ define('GEMINI_API_KEY', 'your-key');
 
 5. Delete `check.php` from the server when you are finished debugging.
 
-### InfinityFree notes (problems we hit)
-
-| Symptom | Cause and fix |
-|---|---|
-| Register / Continue give **404** | `BASE_URL` was `/healthkey`. Set it to `''` on the server |
-| A page or script gives **403 Forbidden** | InfinityFree's filters block some file names (ones containing "chat" or "bot"). Files were renamed: `chatbot.php` to `assistant.php`, `assets/js/chat.js` to `assets/js/msg.js`, `chat-api.php` to `msg-api.php`. Use names like these for any new file |
-| Message disappears when sent | The chat script or API file was blocked (403). Fixed by the renames above |
-| Config error about an undefined constant | `AI_FALLBACK_MODEL` and `AI_DEBUG` must exist in `config.php` (see below) |
-| QR image blank | The qrcode.js CDN is blocked or slow. Hard-refresh and disable ad blockers |
-| Uploaded images missing | Check the file really exists in `assets/img/...` and has permission 644 (folders 755). File names are case-sensitive |
-| AI says it is unavailable | Free hosting can block outgoing calls to Google. Add a valid key, or the basic bot is used |
-
----
-
 ## Configuration reference (`includes/config.php`)
 
 Defaults live in `config.php`. Anything defined first in `config.local.php` wins. Keep `config.local.php` out of git.
