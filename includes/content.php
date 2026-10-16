@@ -14,3 +14,7 @@ function stories(){return [
 'hana-kids-allergy'=>['name'=>'Hana (mum of Adam, 7)','cond'=>'Child nut allergy','quote'=>'He wears it like a superhero band.','sum'=>'A parent\'s story about sending a child with a severe allergy to school.','c'=>['F5CBA7','3B2314','F0484B','FFE1E1'],'scan'=>['O+','Peanuts, tree nuts (anaphylaxis)','Food allergy','Adrenaline auto-injector','Mother'],
  'body'=>['Every parent of an allergic child knows the knot in the stomach on the first day of school. Adam\'s allergy to nuts is severe, and I cannot be at every lunch table.','We chose a bright kids\' band and told Adam it was his superhero band. His teachers know to scan it if he ever seems unwell, and the page tells them his allergy and that he carries an auto-injector.','He has never needed it, thankfully. But the knot is smaller now. If anything happens, whoever is nearest will know what to do and will be able to reach me in one tap.','We update his profile every term, and the QR never changes, so the band he loves keeps working.']]
 ];}
+
+// ---- v2: use the owner's uploaded photo when there is one, otherwise the illustration ----
+function story_art($slug,$s,$w=150){$i=story_img($slug);return $i?'<img class="ph" src="'.e($i).'" alt="'.e($s['name']).'" loading="lazy">':person($s['c'][0],$s['c'][1],$s['c'][2],'ffffff',$w);}
+function bracelet_art($b,$w=170){$u=!empty($b['image'])?img_url('bracelets',$b['image']):null;return $u?'<img class="ph" src="'.e($u).'" alt="'.e($b['name']).'" loading="lazy">':band($b['color1'],$b['color2'],$w);}

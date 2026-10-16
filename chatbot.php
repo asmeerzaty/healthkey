@@ -1,11 +1,11 @@
 <?php $title='AI Assistant'; require 'includes/header.php'; require 'includes/ai.php'; require_login();
 $msgs=array_reverse(q("SELECT sender,message FROM chat_messages WHERE user_id=? AND channel='ai' ORDER BY id DESC LIMIT 60",[$u['id']])->fetchAll());?>
-<div class="chat-tabs"><a class="on" href="chatbot.php"><i class="bi bi-stars"></i> AI Assistant</a><a href="support.php"><i class="bi bi-person-headset"></i> Contact admin <span class="hk-badge" style="display:none">0</span></a></div>
+<div class="chat-tabs"><a class="on" href="chatbot.php"><i class="bi bi-stars"></i> AI Assistant</a><a href="support.php"><i class="bi bi-headset"></i> Contact admin <span class="hk-badge" style="display:none">0</span></a></div>
 <div class="chatpage"><div class="chat-side">
 <div class="card p-3 mb-3"><div class="d-flex align-items-center gap-2 mb-2"><span class="brand-dot text-white"><i class="bi bi-stars"></i></span><b>HealthKey Assistant</b></div>
 <span class="badge <?=ai_ready()?'bg-success':'bg-secondary'?> align-self-start"><?=ai_ready()?'AI mode on':'Basic mode (no API key)'?></span>
 <p class="small text-muted mt-2 mb-0">Ask anything health-related — conditions, medicines, lab results, first aid, or how HEALTHKEY works. Need a person? Use <a href="support.php">Contact admin</a>.</p></div>
-<div class="card p-3 mb-3"><label class="form-check d-flex gap-2 small"><input type="checkbox" id="useprof" class="form-check-input mt-1"><span><b>Use my health profile</b><br><span class="text-muted">Personalises answers (e.g. allergies). It is sent to Google (free tier) only while this is on; leave off if you prefer privacy.</span></span></label></div>
+<div class="card p-3 mb-3"><label class="form-check d-flex gap-2 small"><input type="checkbox" id="useprof" class="form-check-input mt-1"><span><b>Use my health profile</b><br><span class="text-muted">Personalises answers (e.g. allergies). While on, your blood type, conditions, allergies and medication are sent to Google, and on the free tier Google may use them to improve its products. Leave off for privacy.</span></span></label></div>
 <div class="card p-3"><button class="btn btn-sm btn-link text-danger" id="clr">Clear conversation</button></div></div>
 <div class="card chatbox"><div id="msgs" class="msgs"></div>
 <div class="chips-row" id="chips"><?php foreach(['What is hypertension?','Explain how insulin resistance leads to type 2 diabetes','What should I do if someone is having a seizure?','Can I take ibuprofen if I have asthma?','How do I read a cholesterol report?','What is anaphylaxis and how is it treated?'] as $c)echo '<button type="button">'.e($c).'</button>';?></div>
@@ -25,4 +25,5 @@ async function send(t){if(!t.trim())return;document.getElementById('chips').styl
 document.getElementById('f').onsubmit=e=>{e.preventDefault();const i=document.getElementById('m'),v=i.value;i.value='';send(v)};
 document.querySelectorAll('#chips button').forEach(b=>b.onclick=()=>send(b.textContent));
 document.getElementById('clr').onclick=async()=>{if(!confirm('Clear your AI conversation?'))return;const fd=new FormData();fd.append('csrf',HK.csrf);fd.append('action','clear');fd.append('channel','ai');await post(fd);location.reload()};
+document.getElementById('useprof').addEventListener('change',e=>{if(e.target.checked&&!confirm('Your health profile will be sent to Google to personalise answers. On the free tier Google may use it to improve its products. Continue?'))e.target.checked=false});
 </script><?php require 'includes/footer.php';

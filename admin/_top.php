@@ -3,6 +3,7 @@
 $nav=['index'=>'Dashboard','users'=>'Users','patients'=>'Patient Profiles','orders'=>'Orders','appointments'=>'Appointments','qr-codes'=>'QR Codes','scan-logs'=>'Emergency Scan Logs'];
 if($super)$nav=['index'=>'Dashboard','bracelets'=>'Bracelets','staff'=>'Staff (admins)','staff-chat'=>'Staff chat']+array_slice($nav,1);
 else{$nav['messages']='Customer messages';$nav['staff-chat']='Chat with owner';}
+$nav['stories']='Story photos';
 $cur=basename($_SERVER['SCRIPT_NAME'],'.php');$cur=['user-view'=>'users','user-form'=>'users','bracelet-form'=>'bracelets','staff-form'=>'staff'][$cur]??$cur;
 function need_super(){global $super;if(!$super){http_response_code(403);echo '<div class="alert alert-danger">Only the owner can access this page.</div>';require __DIR__.'/_bottom.php';exit;}}
 function page($rows,$per=15){$p=max(1,(int)($_GET['page']??1));return [$p,($p-1)*$per,$per];}

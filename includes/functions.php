@@ -28,3 +28,46 @@ function bot_reply($t){$t=strtolower($t);$r=[
 
 // 'Seen' time label: '10:42 PM' today, otherwise '7 Oct, 10:42 PM'
 function seen_label($dt){$t=strtotime($dt);return date('Y-m-d',$t)===date('Y-m-d')?date('g:i A',$t):date('j M, g:i A',$t);}
+
+// ================= v2 helpers =================
+// ---- Owner-uploaded photos (bracelets + stories) ----
+function img_dir($kind){return __DIR__.'/../assets/img/'.$kind;}
+function img_url($kind,$file){$p=img_dir($kind).'/'.$file;return ($file&&is_file($p))?BASE_URL.'/assets/img/'.$kind.'/'.rawurlencode($file).'?v='.filemtime($p):null;}
+// Validates and stores an uploaded JPG/PNG/WebP. Returns [filename|null, error|null]. The extension comes from the detected MIME type, never from the user's filename.
+function save_upload($field,$kind,$basename){
+ if(empty($_FILES[$field])||$_FILES[$field]['error']===UPLOAD_ERR_NO_FILE)return [null,null];
+ $f=$_FILES[$field];
+ if($f['error']!==UPLOAD_ERR_OK)return [null,'Upload failed (code '.$f['error'].'). Try a smaller image.'];
+ if($f['size']>5*1024*1024)return [null,'That image is larger than 5 MB.'];
+ $info=@getimagesize($f['tmp_name']);$ext=['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp'][$info['mime']??'']??null;
+ if(!$ext)return [null,'Please upload a JPG, PNG or WebP image.'];
+ $dir=img_dir($kind);if(!is_dir($dir))@mkdir($dir,0755,true);
+ $name=$basename.'.'.$ext;
+ if(!@move_uploaded_file($f['tmp_name'],$dir.'/'.$name))return [null,'Could not save the image (is assets/img/'.$kind.' writable?).'];
+ return [$name,null];}
+function story_img($slug){foreach(['jpg','jpeg','png','webp'] as $x){if($u=img_url('stories',$slug.'.'.$x))return $u;}return null;}
+function ua_label($ua){$ua=(string)$ua;foreach(['iPhone'=>'iPhone','iPad'=>'iPad','Android'=>'Android phone','Windows'=>'Windows PC','Macintosh'=>'Mac','Linux'=>'Linux'] as $k=>$v)if(stripos($ua,$k)!==false)return $v;return $ua?'Unknown device':'—';}
+
+// ---- NFC tag text (the short, important-only copy the user pastes into an NFC app) ----
+const NFC_TAGS=['NTAG213'=>137,'NTAG215'=>492,'NTAG216'=>868]; // max NDEF message bytes per chip
+function nfc_clean($s,$max){$s=preg_replace('/[\x00-\x1F\x7F]+/u',' ',(string)$s)??'';$s=trim(preg_replace('/\s+/u',' ',$s)??'');return mb_strcut($s,0,$max,'UTF-8');}
+function nfc_opts_default(){return ['tag'=>'NTAG215','cond'=>1,'meds'=>1,'dob'=>0,'doc'=>0,'link'=>1];}
+function nfc_opts_parse($src){$o=['tag'=>isset(NFC_TAGS[$src['tag']??''])?$src['tag']:'NTAG215'];foreach(['cond','meds','dob','doc','link'] as $k)$o[$k]=!empty($src[$k])?1:0;return $o;}
+// Always keeps: name, blood type, allergies, emergency contact. Optional lines are dropped (doctor, DOB, meds, conditions) only if the tag runs out of room.
+function nfc_build($u,$p,$o,$link=null){
+ $cap=NFC_TAGS[$o['tag']]??492;$useLink=($o['link']&&$link);
+ $linkBytes=$useLink?5+strlen(preg_replace('#^https?://#','',$link)):0;
+ $budget=$cap-10-8-$linkBytes; // text-record overhead + safety margin + optional link record
+ $v=['name'=>nfc_clean($u['name'],40),'blood'=>nfc_clean($p['blood_type'],5),'allergy'=>nfc_clean($p['allergies'],90),'cond'=>nfc_clean($p['medical_conditions'],90),'meds'=>nfc_clean($p['medications'],90),
+  'dob'=>$p['date_of_birth']?:'','doc'=>nfc_clean($p['doctor_name'],30),'cn'=>nfc_clean($p['emergency_contact_name'],30),'cr'=>nfc_clean($p['emergency_contact_relationship'],20),'cp'=>preg_replace('/[^0-9+\-() ]/','',(string)$p['emergency_contact_phone'])];
+ $want=['cond'=>(bool)$o['cond'],'meds'=>(bool)$o['meds'],'dob'=>(bool)$o['dob'],'doc'=>(bool)$o['doc']];$inc=$want;
+ $lines=function()use(&$v,&$inc){$L=['HEALTHKEY EMERGENCY',$v['name'],'BLOOD: '.$v['blood']];
+  if($v['allergy'])$L[]='ALLERGY: '.$v['allergy'];if($inc['cond']&&$v['cond'])$L[]='COND: '.$v['cond'];if($inc['meds']&&$v['meds'])$L[]='MEDS: '.$v['meds'];
+  $L[]='CALL: '.trim($v['cn'].($v['cr']?' ('.$v['cr'].')':'').' '.$v['cp']);if($inc['dob']&&$v['dob'])$L[]='DOB: '.$v['dob'];if($inc['doc']&&$v['doc'])$L[]='DR: '.$v['doc'];return implode("\n",$L);};
+ $stamp="\nUPD: ".date('Y-m-d');$shrunk=false;
+ foreach(['doc','dob','meds','cond'] as $k){if(strlen($lines().$stamp)<=$budget)break;$inc[$k]=false;}
+ for($i=0;$i<80&&strlen($lines().$stamp)>$budget;$i++){$best=null;foreach(['allergy','cond','meds','name'] as $k){if(($k==='cond'&&!$inc['cond'])||($k==='meds'&&!$inc['meds']))continue;if(strlen($v[$k])>14&&($best===null||strlen($v[$k])>strlen($v[$best])))$best=$k;}
+  if($best===null)break;$v[$best]=rtrim(mb_strcut($v[$best],0,strlen($v[$best])-14,'UTF-8')).'...';$shrunk=true;}
+ $body=$lines();$text=$body.$stamp;$used=strlen($text)+10+$linkBytes;
+ $dropped=[];foreach($want as $k=>$w)if($w&&!$inc[$k]&&$v[$k]!=='')$dropped[]=$k;
+ return ['text'=>$text,'link'=>$useLink?$link:null,'cap'=>$cap,'used'=>$used,'fits'=>$used<=$cap-8,'dropped'=>$dropped,'shrunk'=>$shrunk,'hash'=>md5($body.'|'.($useLink?$link:'').'|'.$o['tag'])];}
