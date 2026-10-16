@@ -166,8 +166,3 @@ healthkey/
 | QR codes | purchase / claim / admin generate | my-qr, admin list | pause, resume, replace / admin disable, enable | admin delete |
 | Scan logs | automatic on scan | admin list | none | admin delete / clear all |
 | Chats | send message | AI + admin chats | none | clear AI chat / admin delete thread |
-
-## Migrations
-
-If you imported an older database, run these once in phpMyAdmin as needed:
-`migration_appointments.sql`, `migration_superadmin.sql`, `migration_chat_channels.sql`, `migration_read_at.sql`, `migration_v2.sql`.
